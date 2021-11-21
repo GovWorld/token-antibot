@@ -9,16 +9,10 @@ const provider = new ethers.getDefaultProvider(process.env.NETWORK)
 const { DATA } = require("./csvjson.js");
 async function main() {
     [this.admin1] =  await ethers.getSigners();
-    // const govTokenFactory = await hre.ethers.getContractFactory("JetPack");
-    // const govToken = await govTokenFactory.deploy();
-    // await govToken.deployed();
-    // console.log('TOKEN ADDRESS: ', govToken.address);
-
-    const govTokenFactory = await hre.ethers.getContractAt("JetPack","0xd0F0C40FCD1598721567F140eBf8aF436e7b97cF",this.admin1);
-    for(let i = 0 ; i< DATA.length ;  i++){
-      console.log('i = ',DATA[i]['Ethereum_Wallet_Address']);
-    }
-
+    const govTokenFactory = await hre.ethers.getContractFactory("EthGOVToken");
+    const govToken = await govTokenFactory.deploy("GovWorld Token TST","GOVTST");
+    await govToken.deployed();
+    console.log('TOKEN ADDRESS: ', govToken.address);
 }
 
 

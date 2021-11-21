@@ -15,8 +15,6 @@ contract EthGOVToken is ERC20, Ownable {
     bool public bpEnabled;
     bool public BPDisabledForever = false;
 
-    mapping(address => bool) public freezeList;
-
     uint256 public constant PRECISION = 1e18;
 
     constructor(string memory name, string memory symbol) ERC20(name, symbol) {
@@ -38,5 +36,16 @@ contract EthGOVToken is ERC20, Ownable {
     function setBotProtectionDisableForever() external onlyOwner{
         require(BPDisabledForever == false);
         BPDisabledForever = true;
+    }
+
+    function _transfer(
+        address sender,
+        address recipient,
+        uint256 amount
+    ) override internal virtual {
+        if (bpEnabled && !BPDisabledForever){
+            BP.protect(sender, recipient, amount);
+        }
+       super._transfer(sender, recipient, amount);
     }
 }
