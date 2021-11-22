@@ -9,7 +9,7 @@ const provider = new ethers.getDefaultProvider(process.env.NETWORK)
 const { DATA } = require("./csvjson.js");
 async function main() {
     [this.admin1] =  await ethers.getSigners();
-    const govTokenFactory = await hre.ethers.getContractFactory("EthGOVToken");
+    const govTokenFactory = await hre.ethers.getContractFactory("GOVToken");
     const govToken = await govTokenFactory.deploy("GovWorld Token TST","GOVTST");
     await govToken.deployed();
     console.log('TOKEN ADDRESS: ', govToken.address);
