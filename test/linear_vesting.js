@@ -1,0 +1,207 @@
+const { expect } = require("chai");
+const chai = require("chai");
+const { solidity } = require("ethereum-waffle");
+const { ethers, upgrades} = require("hardhat");
+const { VESTING_SCHEDULE } = require("./utilities/utilities");
+const fs = require('fs');
+
+/**
+ * Make sure the contract start date for testing is set to 01/01/2022 00:00:00
+ * You can do this in the getListingTime function
+ */
+
+chai.use(solidity);
+
+describe("Vesting", function() {
+    
+    let tokenFactory;
+    let token;
+    let mc;
+    let owner;
+    let addr0;
+    let addr1;
+    let addr2;
+    let addr3;
+    let addr4;
+    let addr5;
+    let addr6;
+    let addr7;
+    let addr8;
+    let addr9;
+    let addr10;
+
+    let snapshot;
+    let addrs;
+    let tokenDecimals;
+    let TOTAL_SUPPLY;
+    let ONE_DAY_STAMP;
+
+    async function addAllocations(){
+        //first day: Farming, CEX/DEX, BSC
+        let  sum = 23500000+1000000+1500000;
+        console.log('Vesting Schedule Length: ', VESTING_SCHEDULE.length)
+        console.log('Vesting Schedule Length: ',  addrs.length)
+       
+        for(let i =  0; i < VESTING_SCHEDULE.length ;i++){
+            let  thisAmount = (VESTING_SCHEDULE[i].percent * TOTAL_SUPPLY).toFixed(2);
+            // if(i == 4){
+            //     thisAmount = (0.054 * TOTAL_SUPPLY).toFixed(2);
+            // }
+            sum+=+thisAmount;
+            //finding dailyRate * 1000000000000000000
+            let dailyRate = (((thisAmount/VESTING_SCHEDULE[i].vesting)/thisAmount)*100)*10**18;
+            console.log(`Allocations: ${VESTING_SCHEDULE[i].name} with ${thisAmount} percent tokens at ${dailyRate} percent tokens per day:`);
+            //dailyRate*=1000000000000000000;
+            //console.log('dailyRate =>',dailyRate*10^18);
+
+            //console.log(`Solidity DAILY RATE for ${VESTING_SCHEDULE[i].name} = ${dailyRate}`)
+            let amounts= [];
+            let  walletAmount = (thisAmount/addrs.length);
+            for(let j =  0; j < addrs.length ;j++){
+                amounts.push(ethers.utils.parseUnits(walletAmount.toString(),tokenDecimals));
+            }
+            console.log('SUM=>',sum);
+            console.log('thisAmount:',thisAmount);
+            
+            await mc.addAllocations(addrs,amounts, i);
+            console.log('CurrentSupply:',ethers.utils.formatUnits(await mc.totalSupply(),tokenDecimals));
+
+        }
+    }
+
+    async function checkBeforeVesting(){
+        
+        await network.provider.send("evm_setNextBlockTimestamp", [1640976600]);
+        await network.provider.send("evm_mine");
+        console.log('DATED: BEFORE LISTING TIME 2021/12/31 23:50:00');
+        for(let i = 0 ; i < VESTING_SCHEDULE.length ; i++){
+            console.log(`UNLOCKED for ${VESTING_SCHEDULE[i].name} = ${await mc.getUnlockedVestingAmount(addrs[i])} `)
+            expect(await mc.getUnlockedVestingAmount(addrs[i])).to.equal(0);
+        }
+    }
+    // This is called before each test to reset the contract
+    beforeEach(async function () {
+        tokenDecimals = 18;
+        TOTAL_SUPPLY = 100000000;
+        ONE_DAY_STAMP  = 86400;
+
+        [
+            owner, addr0, addr1, addr2, 
+            addr3, addr4, addr5, addr6, 
+            addr7, addr8, addr9, addr10
+        ] = await ethers.getSigners();
+
+        //snapshot = await network.provider.send("evm_snapshot");
+        tokenFactory = await ethers.getContractFactory("ClaimBoard");
+        const govTokenFactory = await hre.ethers.getContractFactory("GOVToken");
+        const govToken = await govTokenFactory.deploy("GovWorld Token TST","GOVTST");
+        await govToken.deployed();
+        mc = await tokenFactory.deploy(govToken.address);
+
+        await mc.deployed();
+        await govToken.methods.approve(mc.address,68000000*10^18);
+        await govToken.methods.transfer(mc.address,68000000*10^18);
+
+        addrs = [
+            addr0.address,
+            addr1.address, 
+            addr2.address, 
+            addr3.address, 
+            addr4.address,
+            addr5.address,
+            addr6.address,
+            addr7.address,
+            addr8.address,
+            addr9.address
+        ];
+    });
+
+    it("Check if token settings are no placeholders: ", async function() {
+        expect(await mc.name()).to.equal("GOVToken");
+        expect(await mc.symbol()).to.equal("GOV");
+        expect(await mc.decimals()).to.equal(18);
+        
+        const maxSupply = await mc.getMaxTotalSupply();
+        console.log("maxSupply",maxSupply.toString());
+        expect(maxSupply.toString()).to.equal("100000000000000000000000000");
+    });
+
+    it("Test all linear vesting schedules", async function() {
+   
+        //add vesting schedule allocations to vesting wallets.
+        await addAllocations();   
+        let listingTime = (await mc.getListingTime()).toNumber()- ONE_DAY_STAMP;
+        let writeString = '';
+
+        for(let days = 0; days <= 1084; days +=2){
+            let evm_stamp = listingTime+(ONE_DAY_STAMP*days);
+            writeString+=`Vesting DAY\t\t: ',${days}\n Vesting Timestamp\t: ',${evm_stamp}\n`
+
+            await network.provider.send("evm_setNextBlockTimestamp", [evm_stamp]);
+            await network.provider.send("evm_mine");
+            writeString+=`\n\n---------- Testing Linear Vesting For Day ${days} ---------------\n\n`;
+            
+            for(let i = 0; i < VESTING_SCHEDULE.length; i++){
+                let vested = 0;
+                let expectedAmount = 0;
+      
+                if(//ignoring already tested
+                    VESTING_SCHEDULE[i].name != '13: BSC Liquidity'&&
+                    VESTING_SCHEDULE[i].name != '12: ETH liquidity'//&&
+                    //VESTING_SCHEDULE[i].name != '0: Angel'&&
+                   // VESTING_SCHEDULE[i].name != '4: Public'
+                )
+                {
+                    let  daysVested = days - VESTING_SCHEDULE[i].lock;
+                    let currentOneDayVesting = 0;
+                    if(i==4){
+                        currentOneDayVesting=(TOTAL_SUPPLY* (0.054))/VESTING_SCHEDULE[i].vesting; 
+                    }
+                    else{
+                        currentOneDayVesting=(TOTAL_SUPPLY* VESTING_SCHEDULE[i].percent)/VESTING_SCHEDULE[i].vesting; 
+                    }
+                    if(daysVested > VESTING_SCHEDULE[i].vesting){
+                        writeString+=`\nVesting Type\t\t: ${VESTING_SCHEDULE[i].name} 🚀 🚀 🚀  TEST COMPLETE`;
+                        continue;
+                    }
+                    
+                    if(daysVested < 0)
+                        daysVested = 0;
+                    expectedAmount += currentOneDayVesting*(daysVested);
+
+                    if( i == 4 && days >= 1)//for public non linear unlock{
+                    {
+                        let percent= (TOTAL_SUPPLY* VESTING_SCHEDULE[4].percent)*0.1;
+                        expectedAmount+= percent;
+                    }
+                    //provides unlocked  amount for all vesting types
+                    for(let u = 0 ; u < addrs.length ; u++){
+                        vested+=parseFloat(ethers.utils.formatUnits(await mc.getUnlockedVestingAmountByType(addrs[u],i), tokenDecimals));
+                    }
+                    writeString+=`\nVesging Type\t\t:  ${VESTING_SCHEDULE[i].name}`;
+                    writeString+=`\nDays Vested\t\t:  ${daysVested}`;
+                    writeString+=`\nLock Period\t\t:  ${VESTING_SCHEDULE[i].lock}`;
+                    writeString+=`\nTotal Days\t\t:  ${VESTING_SCHEDULE[i].vesting}`;
+                    writeString+=`\nOne Day Amount\t\t:  ${currentOneDayVesting}`;
+                    writeString+=`\nexpectedAmount\t\t:  ${expectedAmount}\n`;
+                    writeString+=`\nVsted\t\t\t:  ${vested}\n`
+                    expect(vested.toFixed(0)).to.eq(expectedAmount.toFixed(0));
+                }    
+            }
+            console.log(`days: ${days}`);
+           
+            writeString+=`\n\n---------- END Linear Vesting For Day  ${days} ---------------\n\n`;
+        }
+        console.log(writeString);
+        fs.appendFile('output.txt', writeString, function (err) {
+        if (err) throw err;
+            console.log('Saved!');
+        });
+        //provides unlocked  amount for all vesting types
+        // for(let u = 0 ; u < addrs.length ; u++){
+        //     vested+=parseFloat(ethers.utils.formatUnits(await mc.getUnlockedVestingAmount(addrs[u]), tokenDecimals));
+        // }
+    });
+});
+
+
