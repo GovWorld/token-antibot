@@ -192,7 +192,7 @@ abstract contract BPContract{
     function protect( address sender, address receiver, uint256 amount ) external virtual;
 }
 
-contract GOVToken is Context, IERC20, IERC20Metadata, Ownable {
+contract FGOVToken is Context, IERC20, IERC20Metadata, Ownable {
     mapping(address => uint256) private _balances;
 
     mapping(address => mapping(address => uint256)) private _allowances;

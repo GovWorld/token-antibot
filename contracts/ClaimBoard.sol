@@ -23,12 +23,13 @@ struct VestingType {
 }
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "hardhat/console.sol";
 
 contract ClaimBoard is Ownable {
     IERC20 govToken;
     mapping(uint => mapping(address => VestingWallet)) public vestingWallets;
     VestingType[] public vestingTypes;
-    uint256 totalAllocations = 0;
+    uint256 public totalAllocations = 0;
 
     uint256 public constant PRECISION = 1e18;
     uint256 public constant ONE_HUNDRED_PERCENT = PRECISION * 100;
@@ -112,22 +113,22 @@ contract ClaimBoard is Ownable {
         vestingTypes.push(VestingType(0, 0 days, true));
 
         // 4: Team 7%, 7,000,000, 6 Month LOCK, 18 months @ rate of 5.5% per month 
-        vestingTypes.push(VestingType(277777777777777800, 180 days, false));
+        vestingTypes.push(VestingType(5555555555555555000, 180 days, false));
 
         // 5: Early advisor 2.25%, 2,250,000, 28 days LOCK, 12 months @ rate of 8.33% per month 
-        vestingTypes.push(VestingType(277777777777777800, 28 days, false));
+        vestingTypes.push(VestingType(8333333333333332000, 28 days, false));
 
         // 6: Future advisor 2.25%, 2,250,000, 28 days LOCK, 12 months @ rate of 8.33% per month 
-        vestingTypes.push(VestingType(277777777777777800, 28 days, false));
+        vestingTypes.push(VestingType(8333333333333332000, 28 days, false));
         
         // 7: GOV Genius rewards 1.50%, 1,500,000 3 days LOCK, 24 months @ rate of 4.16% per month
-        vestingTypes.push(VestingType(138888888888888900, 3 days, false));
+        vestingTypes.push(VestingType(4166666666666666000, 3 days, false));
 
         // 8: Marketting  10.00%, 10,000,000, 24 months @ rate of 4.16% per month 
-        vestingTypes.push(VestingType(138888888888888900, 1 days, false));
+        vestingTypes.push(VestingType(4166666666666667000, 1 days, false));
 
         // 9: Ecosystem  10.00%, 10,000,000 36 months 1,080 days 2.7% per month
-        vestingTypes.push(VestingType(92592592590000000, 4 days, false));
+        vestingTypes.push(VestingType(2777777777777777700, 4 days, false));
     }
 
     // Vested tokens wont be available before the listing time
@@ -180,7 +181,7 @@ contract ClaimBoard is Ownable {
             );
             totalAllocations += totalAmount;
         }
-        require(govToken.balanceOf(address(this)) > totalAllocations, "Not enough contract balance.");
+        require(govToken.balanceOf(address(this)) >= totalAllocations, "Not enough contract balance.");
         return true;
     }
 
@@ -254,7 +255,7 @@ contract ClaimBoard is Ownable {
         view
         returns (uint256)
     {
-        require(vestingTypeIndex == 4 || vestingTypeIndex == 2 || vestingTypeIndex == 3, "Invalid vesting type");
+        require(vestingTypeIndex == 1 || vestingTypeIndex == 2 || vestingTypeIndex == 3, "Invalid vesting type");
         
 
         uint256 unlocked = 0;
@@ -303,7 +304,7 @@ contract ClaimBoard is Ownable {
         uint256 transferableAmountNow = 0;
         //fetch number of days of vesting
         uint256 trueMonths = this.getMonthsOrDays(vestingWallets[vestingType][sender].cliff, true);
-        
+        //sconsole.log("trueMonths=>",trueMonths);
         if (vestingTypes[vestingType].nonLinear == true) {
             uint256 trueDays =   this.getMonthsOrDays(vestingWallets[vestingType][sender].cliff, false);
             transferableAmountNow = this.calculateNonLinear(

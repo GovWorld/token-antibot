@@ -39,32 +39,20 @@ describe("Vesting", function() {
     async function addAllocations(){
         //first day: Farming, CEX/DEX, BSC
         let  sum = 23500000+1000000+1500000;
-        console.log('Vesting Schedule Length: ', VESTING_SCHEDULE.length)
         console.log('Vesting Schedule Length: ',  addrs.length)
        
         for(let i =  0; i < VESTING_SCHEDULE.length ;i++){
             let  thisAmount = (VESTING_SCHEDULE[i].percent * TOTAL_SUPPLY).toFixed(2);
-            // if(i == 4){
-            //     thisAmount = (0.054 * TOTAL_SUPPLY).toFixed(2);
-            // }
-            sum+=+thisAmount;
-            //finding dailyRate * 1000000000000000000
-            let dailyRate = (((thisAmount/VESTING_SCHEDULE[i].vesting)/thisAmount)*100)*10**18;
-            console.log(`Allocations: ${VESTING_SCHEDULE[i].name} with ${thisAmount} percent tokens at ${dailyRate} percent tokens per day:`);
-            //dailyRate*=1000000000000000000;
-            //console.log('dailyRate =>',dailyRate*10^18);
-
-            //console.log(`Solidity DAILY RATE for ${VESTING_SCHEDULE[i].name} = ${dailyRate}`)
+            let totalMonths = VESTING_SCHEDULE[i].vesting/30;
+            let monthlyRate = (((thisAmount/totalMonths)/thisAmount)*100)*10**18;
+            console.log(`Allocations: ${VESTING_SCHEDULE[i].name} with ${thisAmount} percent tokens at ${monthlyRate} percent tokens per day:`);
             let amounts= [];
             let  walletAmount = (thisAmount/addrs.length);
             for(let j =  0; j < addrs.length ;j++){
                 amounts.push(ethers.utils.parseUnits(walletAmount.toString(),tokenDecimals));
-            }
-            console.log('SUM=>',sum);
-            console.log('thisAmount:',thisAmount);
-            
+            }            
             await mc.addAllocations(addrs,amounts, i);
-            console.log('CurrentSupply:',ethers.utils.formatUnits(await mc.totalSupply(),tokenDecimals));
+            console.log('Total Allocations:',ethers.utils.formatUnits(await mc.totalAllocations(),tokenDecimals));
 
         }
     }
@@ -97,11 +85,12 @@ describe("Vesting", function() {
         const govToken = await govTokenFactory.deploy("GovWorld Token TST","GOVTST");
         await govToken.deployed();
         mc = await tokenFactory.deploy(govToken.address);
-
         await mc.deployed();
-        await govToken.methods.approve(mc.address,68000000*10^18);
-        await govToken.methods.transfer(mc.address,68000000*10^18);
-
+        let approval = await govToken.approve(mc.address,ethers.utils.parseUnits("68000000",tokenDecimals));
+        approval.wait();
+        let transfer = await govToken.transfer(mc.address,ethers.utils.parseUnits("68000000",tokenDecimals));
+        transfer.wait();
+        console.log('BALANCE OF CLAIM BOARD =>', ethers.utils.formatUnits(await govToken.balanceOf(mc.address),18));
         addrs = [
             addr0.address,
             addr1.address, 
@@ -114,16 +103,6 @@ describe("Vesting", function() {
             addr8.address,
             addr9.address
         ];
-    });
-
-    it("Check if token settings are no placeholders: ", async function() {
-        expect(await mc.name()).to.equal("GOVToken");
-        expect(await mc.symbol()).to.equal("GOV");
-        expect(await mc.decimals()).to.equal(18);
-        
-        const maxSupply = await mc.getMaxTotalSupply();
-        console.log("maxSupply",maxSupply.toString());
-        expect(maxSupply.toString()).to.equal("100000000000000000000000000");
     });
 
     it("Test all linear vesting schedules", async function() {
@@ -145,46 +124,38 @@ describe("Vesting", function() {
                 let vested = 0;
                 let expectedAmount = 0;
       
-                if(//ignoring already tested
-                    VESTING_SCHEDULE[i].name != '13: BSC Liquidity'&&
-                    VESTING_SCHEDULE[i].name != '12: ETH liquidity'//&&
-                    //VESTING_SCHEDULE[i].name != '0: Angel'&&
-                   // VESTING_SCHEDULE[i].name != '4: Public'
+                if(
+                    //ignoring non linear
+                    VESTING_SCHEDULE[i].name != '1: Seed'&&
+                    VESTING_SCHEDULE[i].name != '3: Private'&&
+                    VESTING_SCHEDULE[i].name != '2: Strategic'
                 )
                 {
-                    let  daysVested = days - VESTING_SCHEDULE[i].lock;
-                    let currentOneDayVesting = 0;
-                    if(i==4){
-                        currentOneDayVesting=(TOTAL_SUPPLY* (0.054))/VESTING_SCHEDULE[i].vesting; 
-                    }
-                    else{
-                        currentOneDayVesting=(TOTAL_SUPPLY* VESTING_SCHEDULE[i].percent)/VESTING_SCHEDULE[i].vesting; 
-                    }
-                    if(daysVested > VESTING_SCHEDULE[i].vesting){
+                    let  monthsVested = Math.floor((days - VESTING_SCHEDULE[i].lock)/30);
+                    let currentOneMonthVesting = 0;
+                    
+                    currentOneMonthVesting=((TOTAL_SUPPLY* VESTING_SCHEDULE[i].percent)/VESTING_SCHEDULE[i].vesting)/30; 
+                    if(monthsVested * 30 > VESTING_SCHEDULE[i].vesting+VESTING_SCHEDULE[i].lock){
                         writeString+=`\nVesting Type\t\t: ${VESTING_SCHEDULE[i].name} 🚀 🚀 🚀  TEST COMPLETE`;
                         continue;
                     }
                     
-                    if(daysVested < 0)
-                        daysVested = 0;
-                    expectedAmount += currentOneDayVesting*(daysVested);
-
-                    if( i == 4 && days >= 1)//for public non linear unlock{
-                    {
-                        let percent= (TOTAL_SUPPLY* VESTING_SCHEDULE[4].percent)*0.1;
-                        expectedAmount+= percent;
-                    }
+                    if(monthsVested < 0)
+                        monthsVested = 0;
+                    expectedAmount += currentOneMonthVesting*(monthsVested);
                     //provides unlocked  amount for all vesting types
                     for(let u = 0 ; u < addrs.length ; u++){
                         vested+=parseFloat(ethers.utils.formatUnits(await mc.getUnlockedVestingAmountByType(addrs[u],i), tokenDecimals));
                     }
                     writeString+=`\nVesging Type\t\t:  ${VESTING_SCHEDULE[i].name}`;
-                    writeString+=`\nDays Vested\t\t:  ${daysVested}`;
+                    writeString+=`\nMonrhs Vested\t\t:  ${monthsVested}`;
                     writeString+=`\nLock Period\t\t:  ${VESTING_SCHEDULE[i].lock}`;
                     writeString+=`\nTotal Days\t\t:  ${VESTING_SCHEDULE[i].vesting}`;
-                    writeString+=`\nOne Day Amount\t\t:  ${currentOneDayVesting}`;
+                    writeString+=`\nOne Day Amount\t\t:  ${currentOneMonthVesting}`;
                     writeString+=`\nexpectedAmount\t\t:  ${expectedAmount}\n`;
                     writeString+=`\nVsted\t\t\t:  ${vested}\n`
+
+                    //console.log(writeString)
                     expect(vested.toFixed(0)).to.eq(expectedAmount.toFixed(0));
                 }    
             }
