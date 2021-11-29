@@ -38,7 +38,7 @@ contract ClaimBoard is Ownable {
     mapping(uint => uint256[][]) public nonLinearUnlocks;
 
     //tokens already claimed out of allocations.
-    mapping(address => uint256) claimed;
+    mapping(address => uint256) public  claimed;
 
     /**
      * Setup the initial supply and types of vesting schemas

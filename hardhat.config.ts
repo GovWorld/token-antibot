@@ -18,6 +18,12 @@ const {
   DEPLOYER_PRIVATE_KEY_3,
   DEPLOYER_PRIVATE_KEY_4,
   DEPLOYER_PRIVATE_KEY_5, 
+  DEPLOYER_PRIVATE_KEY_6,
+  DEPLOYER_PRIVATE_KEY_7,
+  DEPLOYER_PRIVATE_KEY_8,
+  DEPLOYER_PRIVATE_KEY_9,
+  DEPLOYER_PRIVATE_KEY_10, 
+  DEPLOYER_PRIVATE_KEY_11, 
   INFURA_PROJECT_ID 
 } = process.env;
 
@@ -75,7 +81,13 @@ const config: HardhatUserConfig = {
         `0x${DEPLOYER_PRIVATE_KEY_2}`,
         `0x${DEPLOYER_PRIVATE_KEY_3}`,
         `0x${DEPLOYER_PRIVATE_KEY_4}`,
-        `0x${DEPLOYER_PRIVATE_KEY_5}`
+        `0x${DEPLOYER_PRIVATE_KEY_5}`,
+        `0x${DEPLOYER_PRIVATE_KEY_6}`, 
+        `0x${DEPLOYER_PRIVATE_KEY_7}`,
+        `0x${DEPLOYER_PRIVATE_KEY_8}`,
+        `0x${DEPLOYER_PRIVATE_KEY_9}`,
+        `0x${DEPLOYER_PRIVATE_KEY_10}`,
+        `0x${DEPLOYER_PRIVATE_KEY_11}`
       ],
     },
     rinkeby: {
@@ -86,7 +98,14 @@ const config: HardhatUserConfig = {
         `0x${DEPLOYER_PRIVATE_KEY_2}`,
         `0x${DEPLOYER_PRIVATE_KEY_3}`,
         `0x${DEPLOYER_PRIVATE_KEY_4}`,
-        `0x${DEPLOYER_PRIVATE_KEY_5}`
+        `0x${DEPLOYER_PRIVATE_KEY_5}`,
+        `0x${DEPLOYER_PRIVATE_KEY_6}`, 
+        `0x${DEPLOYER_PRIVATE_KEY_7}`,
+        `0x${DEPLOYER_PRIVATE_KEY_8}`,
+        `0x${DEPLOYER_PRIVATE_KEY_9}`,
+        `0x${DEPLOYER_PRIVATE_KEY_10}`,
+        `0x${DEPLOYER_PRIVATE_KEY_11}`
+
       ],
       gasPrice: 35000000000,
 

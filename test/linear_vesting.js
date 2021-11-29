@@ -76,7 +76,7 @@ describe("Vesting", function() {
         [
             owner, addr0, addr1, addr2, 
             addr3, addr4, addr5, addr6, 
-            addr7, addr8, addr9, addr10
+            addr7, addr8, addr9
         ] = await ethers.getSigners();
 
         //snapshot = await network.provider.send("evm_snapshot");
@@ -109,9 +109,8 @@ describe("Vesting", function() {
    
         //add vesting schedule allocations to vesting wallets.
         await addAllocations();   
-        let listingTime = (await mc.getListingTime()).toNumber()- ONE_DAY_STAMP;
+        let listingTime = (await mc.getListingTime()).toNumber();
         let writeString = '';
-
         for(let days = 0; days <= 1084; days +=2){
             let evm_stamp = listingTime+(ONE_DAY_STAMP*days);
             writeString+=`Vesting DAY\t\t: ',${days}\n Vesting Timestamp\t: ',${evm_stamp}\n`
@@ -134,8 +133,8 @@ describe("Vesting", function() {
                     let  monthsVested = Math.floor((days - VESTING_SCHEDULE[i].lock)/30);
                     let currentOneMonthVesting = 0;
                     
-                    currentOneMonthVesting=((TOTAL_SUPPLY* VESTING_SCHEDULE[i].percent)/VESTING_SCHEDULE[i].vesting)/30; 
-                    if(monthsVested * 30 > VESTING_SCHEDULE[i].vesting+VESTING_SCHEDULE[i].lock){
+                    currentOneMonthVesting=((TOTAL_SUPPLY* VESTING_SCHEDULE[i].percent)/(VESTING_SCHEDULE[i].vesting/30)); 
+                    if(monthsVested  > VESTING_SCHEDULE[i].vesting/30){
                         writeString+=`\nVesting Type\t\t: ${VESTING_SCHEDULE[i].name} 🚀 🚀 🚀  TEST COMPLETE`;
                         continue;
                     }
@@ -150,12 +149,12 @@ describe("Vesting", function() {
                     writeString+=`\nVesging Type\t\t:  ${VESTING_SCHEDULE[i].name}`;
                     writeString+=`\nMonrhs Vested\t\t:  ${monthsVested}`;
                     writeString+=`\nLock Period\t\t:  ${VESTING_SCHEDULE[i].lock}`;
-                    writeString+=`\nTotal Days\t\t:  ${VESTING_SCHEDULE[i].vesting}`;
-                    writeString+=`\nOne Day Amount\t\t:  ${currentOneMonthVesting}`;
+                    writeString+=`\nTotal Months\t\t:  ${VESTING_SCHEDULE[i].vesting/30}`;
+                    writeString+=`\nOne Month Amount\t:  ${currentOneMonthVesting}`;
                     writeString+=`\nexpectedAmount\t\t:  ${expectedAmount}\n`;
                     writeString+=`\nVsted\t\t\t:  ${vested}\n`
 
-                    //console.log(writeString)
+                    console.log(writeString)
                     expect(vested.toFixed(0)).to.eq(expectedAmount.toFixed(0));
                 }    
             }
