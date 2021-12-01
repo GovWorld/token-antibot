@@ -112,7 +112,6 @@ describe("Vesting", function() {
         try{
             //add vesting schedule allocations to vesting wallets.
             await addAllocations(); 
-            return;  
             let listingTime = (await mc.getListingTime()).toNumber();
             for(let days = 0; days <= 1084; days +=2){
                 let evm_stamp = listingTime+(ONE_DAY_STAMP*days);
