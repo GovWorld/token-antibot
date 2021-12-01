@@ -20,6 +20,8 @@ struct VestingType {
     uint256 monthlyRate;
     uint256 cliff;
     bool nonLinear;
+    uint256 percent; //allocation percentage out of total supply  * 100  for 2 decimals im percentage
+    uint256 totalAllocated;
 }
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -39,6 +41,9 @@ contract ClaimBoard is Ownable {
 
     //tokens already claimed out of allocations.
     mapping(address => uint256) public  claimed;
+
+    event AllocationAdded(address, uint256);
+    event Claimed(address, uint256);
 
     /**
      * Setup the initial supply and types of vesting schemas
@@ -116,37 +121,37 @@ contract ClaimBoard is Ownable {
             [uint256(1000000000000000000), 1] //10% for month 5
         ];
         // 0: Angel 7%, 7,000,000 - 21 days cliff, At cliff end 10% for 10 months
-        vestingTypes.push(VestingType(10000000000000000000, 21 days, false));
+        vestingTypes.push(VestingType(10000000000000000000, 21 days, false,700000000000000000,0));
 
         // 1: Seed 8.00%, 8,000,000, 14 days cliff, non linear schedule defined above
-        vestingTypes.push(VestingType(0, 0 days, true));
+        vestingTypes.push(VestingType(0, 0 days, true,800000000000000000,0));
 
         // 2: Strategic 10%, 10,000,000, 7 Days LOCK, non linear schedule defined above
-        vestingTypes.push(VestingType(0, 0 days, true));
+        vestingTypes.push(VestingType(0, 0 days, true,1000000000000000000,0));
 
         // 3: Pivate 10%, 10,000,000, 1 Days LOCK,  non linear schedule defined above
-        vestingTypes.push(VestingType(0, 0 days, true));
+        vestingTypes.push(VestingType(0, 0 days, true,1000000000000000000,0));
 
        // 4: Public 6%, 6,000,000, 10% @ TGE 20 % for 4 months and 10 % month 5
-        vestingTypes.push(VestingType(0, 0 days, true));
+        vestingTypes.push(VestingType(0, 0 days, true,600000000000000000,0));
 
         // 5: Team 7%, 7,000,000, 6 Month LOCK, 18 months @ rate of 5.5% per month 
-        vestingTypes.push(VestingType(5555555555555555000, 180 days, false));
+        vestingTypes.push(VestingType(5555555555555555000, 180 days, false,700000000000000000,0));
 
         // 6: Early advisor 2.25%, 2,250,000, 28 days LOCK, 12 months @ rate of 8.33% per month 
-        vestingTypes.push(VestingType(8333333333333332000, 28 days, false));
+        vestingTypes.push(VestingType(8333333333333332000, 28 days, false,225000000000000000,0));
 
         // 7: Future advisor 2.25%, 2,250,000, 28 days LOCK, 12 months @ rate of 8.33% per month 
-        vestingTypes.push(VestingType(8333333333333332000, 28 days, false));
+        vestingTypes.push(VestingType(8333333333333332000, 28 days, false,225000000000000000,0));
         
         // 8: GOV Genius rewards 1.50%, 1,500,000 3 days LOCK, 24 months @ rate of 4.16% per month
-        vestingTypes.push(VestingType(4166666666666666000, 3 days, false));
+        vestingTypes.push(VestingType(4166666666666666000, 3 days, false,150000000000000000,0));
 
         // 9: Marketting  10.00%, 10,000,000, 24 months @ rate of 4.16% per month 
-        vestingTypes.push(VestingType(4166666666666667000, 1 days, false));
+        vestingTypes.push(VestingType(4166666666666667000, 1 days, false,1000000000000000000,0));
 
         // 10: Ecosystem  10.00%, 10,000,000 36 months 1,080 days 2.7% per month
-        vestingTypes.push(VestingType(2777777777777777700, 4 days, false));
+        vestingTypes.push(VestingType(2777777777777777700, 4 days, false,1000000000000000000,0));
     }
 
     // Vested tokens wont be available before the listing time
@@ -175,7 +180,13 @@ contract ClaimBoard is Ownable {
             vestingTypeIndex < vestingTypes.length,
             "Vesting type isnt found"
         );
-
+        for(uint256 i = 0 ; i < totalAmounts.length ; i++){
+            vestingTypes[vestingTypeIndex].totalAllocated += totalAmounts[i];
+        }
+        console.log('totalAllocated: %d',vestingTypes[vestingTypeIndex].totalAllocated);
+        console.log('Calculatted: %d',(govToken.totalSupply()*vestingTypes[vestingTypeIndex].percent)/(100*10**18));
+        require(vestingTypes[vestingTypeIndex].totalAllocated
+                <= (govToken.totalSupply()*vestingTypes[vestingTypeIndex].percent)/(10*10**18),"Can not allocate more then round limit");
         VestingType memory vestingType = vestingTypes[vestingTypeIndex];
         uint256 addressesLength = addresses.length;
         for (uint256 i = 0; i < addressesLength; i++) {
@@ -228,6 +239,7 @@ contract ClaimBoard is Ownable {
             );
 
         vestingWallets[vestingTypeIndex][wallet] = vestingWallet;
+        emit AllocationAdded(wallet,totalAmount);
     }
 
     function getTimestamp() external view returns (uint256) {
@@ -421,5 +433,6 @@ contract ClaimBoard is Ownable {
         govToken.approve(msg.sender,amount);
         govToken.transfer(msg.sender,amount);
         claimed[msg.sender] = claimed[msg.sender] + amount;
+        emit Claimed(msg.sender, amount);
     }
 }
