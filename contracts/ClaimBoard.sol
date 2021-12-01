@@ -51,19 +51,21 @@ contract ClaimBoard is Ownable {
             [uint256(0), 14], //14 Day cliff
             [uint256(1000000000000000000), 1], //10% at cliff end 
             [uint256(0), 45], //0 till Month 2 
-            [uint256(1125000000000000000), 1], //month 2-8 11.25 %
+            [uint256(1125000000000000000), 1], //month 2-9 11.25 %
             [uint256(0), 29], //0 till Month 3 
-            [uint256(1125000000000000000), 1], //month 2-8 11.25 %            
+            [uint256(1125000000000000000), 1], //month 2-9 11.25 %            
             [uint256(0), 29], //0 till Month 4 
-            [uint256(1125000000000000000), 1], //month 2-8 11.25 %
+            [uint256(1125000000000000000), 1], //month 2-9 11.25 %
             [uint256(0), 29], //0 till Month 5 
-            [uint256(1125000000000000000), 1], //month 2-8 11.25 %
+            [uint256(1125000000000000000), 1], //month 2-9 11.25 %
             [uint256(0), 29], //0 till Month 6 
-            [uint256(1125000000000000000), 1], //month 2-8 11.25 %
+            [uint256(1125000000000000000), 1], //month 2-9 11.25 %
             [uint256(0), 29], //0 till Month 7 
-            [uint256(1125000000000000000), 1], //month 2-8 11.25 %
+            [uint256(1125000000000000000), 1], //month 2-9 11.25 %
             [uint256(0), 29], //0 till Month 8 
-            [uint256(1125000000000000000), 1] //month 2-8 11.25 %
+            [uint256(1125000000000000000), 1], //month 2-9 11.25 %
+            [uint256(0), 29], //0 till Month 9 
+            [uint256(1125000000000000000), 1]
         ];
         //STRATEGIC ROUND
          nonLinearUnlocks[2] = [
@@ -85,49 +87,65 @@ contract ClaimBoard is Ownable {
         //PRIVATE ROUND
          nonLinearUnlocks[3] = [
             [uint256(500000000000000000), 1], //5% at TGE
+            [uint256(0), 3], //72h Cliff
+            [uint256(500000000000000000), 1], //5% after cliff
             [uint256(0), 29], //1 Month after TGE
-            [uint256(1500000000000000000), 1], //15% for 6 months
+            [uint256(1500000000000000000), 1], //15% for months 2-7
             [uint256(0), 45], //0 till Month 2 
-            [uint256(1500000000000000000), 1], //15% for 6 months
+            [uint256(1500000000000000000), 1], //15% for months 2-7
             [uint256(0), 29], //0 till Month 3 
-            [uint256(1500000000000000000), 1], //15% for 6 months
+            [uint256(1500000000000000000), 1], //15% for months 2-7
             [uint256(0), 29], //0 till Month 4 
-            [uint256(1500000000000000000), 1], //15% for 6 months
+            [uint256(1500000000000000000), 1], //15% for months 2-7
             [uint256(0), 29], //0 till Month 5 
-            [uint256(1500000000000000000), 1], //15% for 6 months
+            [uint256(1500000000000000000), 1], //15% for months 2-7
             [uint256(0), 29], //0 till Month 6 
-            [uint256(1500000000000000000), 1], //15% for 6 months
-            [uint256(0), 29], //0 till Month 7 
-            [uint256(500000000000000000), 1] //5% for 7 months
+            [uint256(1500000000000000000), 1] //15% for months 2-7
+        ];
+        nonLinearUnlocks[4] = [
+            [uint256(1000000000000000000), 1], //5% at TGE
+            [uint256(0), 29], //1 Month after TGE
+            [uint256(2000000000000000000), 1], //20% for 4 months
+            [uint256(0), 29], //2 Month after TGE
+            [uint256(2000000000000000000), 1], //20% for 4 months
+            [uint256(0), 45], //0 till Month 3 
+            [uint256(2000000000000000000), 1], //20% for 4 months
+            [uint256(0), 29], //0 till Month 4 
+            [uint256(2000000000000000000), 1],//20% for 4 months
+            [uint256(0), 29], //0 till Month 4 
+            [uint256(1000000000000000000), 1] //10% for month 5
         ];
         // 0: Angel 7%, 7,000,000 - 21 days cliff, At cliff end 10% for 10 months
         vestingTypes.push(VestingType(10000000000000000000, 21 days, false));
 
         // 1: Seed 8.00%, 8,000,000, 14 days cliff, non linear schedule defined above
-        vestingTypes.push(VestingType(0, 14 days, true));
+        vestingTypes.push(VestingType(0, 0 days, true));
 
         // 2: Strategic 10%, 10,000,000, 7 Days LOCK, non linear schedule defined above
-        vestingTypes.push(VestingType(0, 7 days, true));
+        vestingTypes.push(VestingType(0, 0 days, true));
 
         // 3: Pivate 10%, 10,000,000, 1 Days LOCK,  non linear schedule defined above
         vestingTypes.push(VestingType(0, 0 days, true));
 
-        // 4: Team 7%, 7,000,000, 6 Month LOCK, 18 months @ rate of 5.5% per month 
+       // 4: Public 6%, 6,000,000, 10% @ TGE 20 % for 4 months and 10 % month 5
+        vestingTypes.push(VestingType(0, 0 days, true));
+
+        // 5: Team 7%, 7,000,000, 6 Month LOCK, 18 months @ rate of 5.5% per month 
         vestingTypes.push(VestingType(5555555555555555000, 180 days, false));
 
-        // 5: Early advisor 2.25%, 2,250,000, 28 days LOCK, 12 months @ rate of 8.33% per month 
+        // 6: Early advisor 2.25%, 2,250,000, 28 days LOCK, 12 months @ rate of 8.33% per month 
         vestingTypes.push(VestingType(8333333333333332000, 28 days, false));
 
-        // 6: Future advisor 2.25%, 2,250,000, 28 days LOCK, 12 months @ rate of 8.33% per month 
+        // 7: Future advisor 2.25%, 2,250,000, 28 days LOCK, 12 months @ rate of 8.33% per month 
         vestingTypes.push(VestingType(8333333333333332000, 28 days, false));
         
-        // 7: GOV Genius rewards 1.50%, 1,500,000 3 days LOCK, 24 months @ rate of 4.16% per month
+        // 8: GOV Genius rewards 1.50%, 1,500,000 3 days LOCK, 24 months @ rate of 4.16% per month
         vestingTypes.push(VestingType(4166666666666666000, 3 days, false));
 
-        // 8: Marketting  10.00%, 10,000,000, 24 months @ rate of 4.16% per month 
+        // 9: Marketting  10.00%, 10,000,000, 24 months @ rate of 4.16% per month 
         vestingTypes.push(VestingType(4166666666666667000, 1 days, false));
 
-        // 9: Ecosystem  10.00%, 10,000,000 36 months 1,080 days 2.7% per month
+        // 10: Ecosystem  10.00%, 10,000,000 36 months 1,080 days 2.7% per month
         vestingTypes.push(VestingType(2777777777777777700, 4 days, false));
     }
 
@@ -255,7 +273,7 @@ contract ClaimBoard is Ownable {
         view
         returns (uint256)
     {
-        require(vestingTypeIndex == 1 || vestingTypeIndex == 2 || vestingTypeIndex == 3, "Invalid vesting type");
+        require(vestingTypeIndex == 1 || vestingTypeIndex == 2 || vestingTypeIndex == 3 || vestingTypeIndex == 4, "Invalid vesting type");
         
 
         uint256 unlocked = 0;
