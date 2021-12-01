@@ -151,8 +151,7 @@ contract ClaimBoard is Ownable {
 
     // Vested tokens wont be available before the listing time
     function getListingTime() public pure returns (uint256) {
-        //return 1631554591;
-        return 1640977200;
+        return 1638835200;//Tue Dec 07 2021 00:00:00 GMT+0000
     }
 
     function mulDiv(

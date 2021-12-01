@@ -27,23 +27,28 @@ async function main() {
       addr8.address,
       addr9.address
     ];
-
-    const govTokenFactory = await hre.ethers.getContractFactory("GOVToken");
-    const govToken = await govTokenFactory.deploy("GovWorld Token TST","GOVTST");
-    await govToken.deployed();
-    console.log('TOKEN ADDRESS: ', govToken.address);
-
-    const claimFactory = await hre.ethers.getContractFactory("ClaimBoard");
-    const claimBoard = await claimFactory.deploy(govToken.address);
-    await claimBoard.deployed();
+    let govToken = await hre.ethers.getContractAt('GOVToken','0xd76183a6c17ef96938c23e85b8d1ac072e39c251')
+    if(!govToken){
+      const govTokenFactory = await hre.ethers.getContractFactory("GOVToken");
+      govToken = await govTokenFactory.deploy("GovWorld Token TST","GOVTST");    
+      await govToken.deployed();
+      console.log('TOKEN ADDRESS: ', govToken.address);
+    }
+    let claimBoard = await hre.ethers.getContractAt('ClaimBoard','0x35a0601e75d69AB761f4D99b7a74a1ddf03C2a3D')
+    if(!claimBoard){
+      const claimFactory = await hre.ethers.getContractFactory("ClaimBoard");
+      claimBoard = await claimFactory.deploy(govToken.address);
+      await claimBoard.deployed();
+      let approval = await govToken.approve(claimBoard.address,ethers.utils.parseUnits("74000000",tokenDecimals));
+      approval.wait();
+      let transfer = await govToken.transfer(claimBoard.address,ethers.utils.parseUnits("74000000",tokenDecimals));
+      transfer.wait();
+      
+    }
     console.log('CLAIM BOARD ADDRESS: ', claimBoard.address);
 
     //transfer vesting token allocation to claim board contract
-    let approval = await govToken.approve(claimBoard.address,ethers.utils.parseUnits("68000000",tokenDecimals));
-    approval.wait();
-    let transfer = await govToken.transfer(claimBoard.address,ethers.utils.parseUnits("68000000",tokenDecimals));
-    transfer.wait();
-    await addAllocations(addrs,claimBoard);
+   await addAllocations(addrs,claimBoard);
 }
 
 
