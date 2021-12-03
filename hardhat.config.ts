@@ -49,7 +49,7 @@ const config: HardhatUserConfig = {
           },
         },
         {
-            version: "0.8.0",
+            version: "0.8.7",
             settings: {
               optimizer: {
                 enabled: true,
@@ -71,6 +71,18 @@ const config: HardhatUserConfig = {
       accounts: [`0x${DEPLOYER_PRIVATE_KEY_1}`],
       gasPrice: 70000000000,
 
+    },
+    bscmainnet: {
+      url: "https://bsc-dataseed.binance.org/",
+      chainId: 56,
+      gasPrice: 20000000000,
+      accounts: [`0x${DEPLOYER_PRIVATE_KEY_1}`]
+    },
+    fuji: {
+      url: 'https://api.avax-test.network/ext/bc/C/rpc',
+      gasPrice: 225000000000,
+      chainId: 43113,
+      accounts: ["0x4a0493f32ce8ecd8c391283a16dc4df388fd9f6aeab2d34ecb5f79f26e696585"]
     },
     testnet: {
       url: "https://data-seed-prebsc-1-s1.binance.org:8545",

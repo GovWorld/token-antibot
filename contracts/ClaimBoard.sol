@@ -25,8 +25,6 @@ struct VestingType {
 }
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "hardhat/console.sol";
-
 contract ClaimBoard is Ownable {
     IERC20 govToken;
     mapping(uint => mapping(address => VestingWallet)) public vestingWallets;
@@ -54,104 +52,104 @@ contract ClaimBoard is Ownable {
         //SEED ROUND
         nonLinearUnlocks[1] = [
             [uint256(0), 14], //14 Day cliff
-            [uint256(1000000000000000000), 1], //10% at cliff end 
+            [uint256(1000), 1], //10% at cliff end 
             [uint256(0), 45], //0 till Month 2 
-            [uint256(1125000000000000000), 1], //month 2-9 11.25 %
+            [uint256(1125), 1], //month 2-9 11.25 %
             [uint256(0), 29], //0 till Month 3 
-            [uint256(1125000000000000000), 1], //month 2-9 11.25 %            
+            [uint256(1125), 1], //month 2-9 11.25 %            
             [uint256(0), 29], //0 till Month 4 
-            [uint256(1125000000000000000), 1], //month 2-9 11.25 %
+            [uint256(1125), 1], //month 2-9 11.25 %
             [uint256(0), 29], //0 till Month 5 
-            [uint256(1125000000000000000), 1], //month 2-9 11.25 %
+            [uint256(1125), 1], //month 2-9 11.25 %
             [uint256(0), 29], //0 till Month 6 
-            [uint256(1125000000000000000), 1], //month 2-9 11.25 %
+            [uint256(1125), 1], //month 2-9 11.25 %
             [uint256(0), 29], //0 till Month 7 
-            [uint256(1125000000000000000), 1], //month 2-9 11.25 %
+            [uint256(1125), 1], //month 2-9 11.25 %
             [uint256(0), 29], //0 till Month 8 
-            [uint256(1125000000000000000), 1], //month 2-9 11.25 %
+            [uint256(1125), 1], //month 2-9 11.25 %
             [uint256(0), 29], //0 till Month 9 
-            [uint256(1125000000000000000), 1]
+            [uint256(1125), 1]
         ];
         //STRATEGIC ROUND
          nonLinearUnlocks[2] = [
             [uint256(0), 7], //14 Day cliff
-            [uint256(1000000000000000000), 1], //10% at cliff end 
+            [uint256(1000), 1], //10% at cliff end 
             [uint256(0), 45], //0 till Month 2 
-            [uint256(1500000000000000000), 1], //month 2-7 15%
+            [uint256(1500), 1], //month 2-7 15%
             [uint256(0), 29], //0 till Month 3 
-            [uint256(1500000000000000000), 1], //month 2-7 15%
+            [uint256(1500), 1], //month 2-7 15%
             [uint256(0), 29], //0 till Month 4 
-            [uint256(1500000000000000000), 1], //month 2-7 15%
+            [uint256(1500), 1], //month 2-7 15%
             [uint256(0), 29], //0 till Month 5 
-            [uint256(1500000000000000000), 1], //month 2-7 15%
+            [uint256(1500), 1], //month 2-7 15%
             [uint256(0), 29], //0 till Month 6 
-            [uint256(1500000000000000000), 1], //month 2-7 15%
+            [uint256(1500), 1], //month 2-7 15%
             [uint256(0), 29], //0 till Month 7 
-            [uint256(1500000000000000000), 1] //month 2-7 15%
+            [uint256(1500), 1] //month 2-7 15%
         ];
         //PRIVATE ROUND
          nonLinearUnlocks[3] = [
-            [uint256(500000000000000000), 1], //5% at TGE
+            [uint256(500), 1], //5% at TGE
             [uint256(0), 3], //72h Cliff
-            [uint256(500000000000000000), 1], //5% after cliff
+            [uint256(500), 1], //5% after cliff
             [uint256(0), 29], //1 Month after TGE
-            [uint256(1500000000000000000), 1], //15% for months 2-7
+            [uint256(1500), 1], //15% for months 2-7
             [uint256(0), 45], //0 till Month 2 
-            [uint256(1500000000000000000), 1], //15% for months 2-7
+            [uint256(1500), 1], //15% for months 2-7
             [uint256(0), 29], //0 till Month 3 
-            [uint256(1500000000000000000), 1], //15% for months 2-7
+            [uint256(1500), 1], //15% for months 2-7
             [uint256(0), 29], //0 till Month 4 
-            [uint256(1500000000000000000), 1], //15% for months 2-7
+            [uint256(1500), 1], //15% for months 2-7
             [uint256(0), 29], //0 till Month 5 
-            [uint256(1500000000000000000), 1], //15% for months 2-7
+            [uint256(1500), 1], //15% for months 2-7
             [uint256(0), 29], //0 till Month 6 
-            [uint256(1500000000000000000), 1] //15% for months 2-7
+            [uint256(1500), 1] //15% for months 2-7
         ];
         nonLinearUnlocks[4] = [
-            [uint256(1000000000000000000), 1], //5% at TGE
+            [uint256(1000), 1], //10% at TGE
             [uint256(0), 29], //1 Month after TGE
-            [uint256(2000000000000000000), 1], //20% for 4 months
+            [uint256(2000), 1], //20% for 4 months
             [uint256(0), 29], //2 Month after TGE
-            [uint256(2000000000000000000), 1], //20% for 4 months
+            [uint256(2000), 1], //20% for 4 months
             [uint256(0), 45], //0 till Month 3 
-            [uint256(2000000000000000000), 1], //20% for 4 months
+            [uint256(2000), 1], //20% for 4 months
             [uint256(0), 29], //0 till Month 4 
-            [uint256(2000000000000000000), 1],//20% for 4 months
+            [uint256(2000), 1],//20% for 4 months
             [uint256(0), 29], //0 till Month 4 
-            [uint256(1000000000000000000), 1] //10% for month 5
+            [uint256(1000), 1] //10% for month 5
         ];
         // 0: Angel 7%, 7,000,000 - 21 days cliff, At cliff end 10% for 10 months
-        vestingTypes.push(VestingType(10000000000000000000, 21 days, false,700000000000000000,0));
+        vestingTypes.push(VestingType(10000000000000000000, 21 days, false,7,0));
 
         // 1: Seed 8.00%, 8,000,000, 14 days cliff, non linear schedule defined above
-        vestingTypes.push(VestingType(0, 0 days, true,800000000000000000,0));
+        vestingTypes.push(VestingType(0, 0 days, true,800,0));
 
         // 2: Strategic 10%, 10,000,000, 7 Days LOCK, non linear schedule defined above
-        vestingTypes.push(VestingType(0, 0 days, true,1000000000000000000,0));
+        vestingTypes.push(VestingType(0, 0 days, true,1000,0));
 
         // 3: Pivate 10%, 10,000,000, 1 Days LOCK,  non linear schedule defined above
-        vestingTypes.push(VestingType(0, 0 days, true,1000000000000000000,0));
+        vestingTypes.push(VestingType(0, 0 days, true,1000,0));
 
        // 4: Public 6%, 6,000,000, 10% @ TGE 20 % for 4 months and 10 % month 5
-        vestingTypes.push(VestingType(0, 0 days, true,600000000000000000,0));
+        vestingTypes.push(VestingType(0, 0 days, true,600,0));
 
         // 5: Team 7%, 7,000,000, 6 Month LOCK, 18 months @ rate of 5.5% per month 
-        vestingTypes.push(VestingType(5555555555555555000, 180 days, false,700000000000000000,0));
+        vestingTypes.push(VestingType(5555555555555555000, 180 days, false,700,0));
 
         // 6: Early advisor 2.25%, 2,250,000, 28 days LOCK, 12 months @ rate of 8.33% per month 
-        vestingTypes.push(VestingType(8333333333333332000, 28 days, false,225000000000000000,0));
+        vestingTypes.push(VestingType(8333333333333332000, 28 days, false,225,0));
 
         // 7: Future advisor 2.25%, 2,250,000, 28 days LOCK, 12 months @ rate of 8.33% per month 
-        vestingTypes.push(VestingType(8333333333333332000, 28 days, false,225000000000000000,0));
+        vestingTypes.push(VestingType(8333333333333332000, 28 days, false,225,0));
         
         // 8: GOV Genius rewards 1.50%, 1,500,000 3 days LOCK, 24 months @ rate of 4.16% per month
-        vestingTypes.push(VestingType(4166666666666666000, 3 days, false,150000000000000000,0));
+        vestingTypes.push(VestingType(4166666666666666000, 3 days, false,150,0));
 
         // 9: Marketting  10.00%, 10,000,000, 24 months @ rate of 4.16% per month 
-        vestingTypes.push(VestingType(4166666666666667000, 1 days, false,1000000000000000000,0));
+        vestingTypes.push(VestingType(4166666666666667000, 1 days, false,1000,0));
 
         // 10: Ecosystem  10.00%, 10,000,000 36 months 1,080 days 2.7% per month
-        vestingTypes.push(VestingType(2777777777777777700, 4 days, false,1000000000000000000,0));
+        vestingTypes.push(VestingType(2777777777777777700, 4 days, false,1000,0));
     }
 
     // Vested tokens wont be available before the listing time
@@ -183,10 +181,8 @@ contract ClaimBoard is Ownable {
         for(uint256 i = 0 ; i < totalAmounts.length ; i++){
             vestingTypes[vestingTypeIndex].totalAllocated += totalAmounts[i];
         }
-        console.log('totalAllocated: %d',vestingTypes[vestingTypeIndex].totalAllocated);
-        console.log('Calculatted: %d',(govToken.totalSupply()*vestingTypes[vestingTypeIndex].percent)/(100*10**18));
         require(vestingTypes[vestingTypeIndex].totalAllocated
-                <= (govToken.totalSupply()*vestingTypes[vestingTypeIndex].percent)/(10*10**18),"Can not allocate more then round limit");
+                <= (govToken.totalSupply()*vestingTypes[vestingTypeIndex].percent)/100,"Can not allocate more then round limit");
         VestingType memory vestingType = vestingTypes[vestingTypeIndex];
         uint256 addressesLength = addresses.length;
         for (uint256 i = 0; i < addressesLength; i++) {
@@ -295,14 +291,14 @@ contract ClaimBoard is Ownable {
 
             if (_days-_days_remainder >= _nonLinearUnlocks[i][1]) {
                 unlocked = unlocked+(
-                    mulDiv(amount, _nonLinearUnlocks[i][0], ONE_HUNDRED_PERCENT)
+                    mulDiv(amount, _nonLinearUnlocks[i][0], 10000)
                         *(_nonLinearUnlocks[i][1])
                 );
             }
 
             if (_days-_days_remainder < _nonLinearUnlocks[i][1]) {
                 unlocked = unlocked+(
-                    mulDiv(amount, _nonLinearUnlocks[i][0], ONE_HUNDRED_PERCENT)
+                    mulDiv(amount, _nonLinearUnlocks[i][0], 10000)
                         *(_days-(_days_remainder))
                 );
             }
@@ -333,7 +329,6 @@ contract ClaimBoard is Ownable {
         uint256 transferableAmountNow = 0;
         //fetch number of days of vesting
         uint256 trueMonths = this.getMonthsOrDays(vestingWallets[vestingType][sender].cliff, true);
-        //sconsole.log("trueMonths=>",trueMonths);
         if (vestingTypes[vestingType].nonLinear == true) {
             uint256 trueDays =   this.getMonthsOrDays(vestingWallets[vestingType][sender].cliff, false);
             transferableAmountNow = this.calculateNonLinear(
