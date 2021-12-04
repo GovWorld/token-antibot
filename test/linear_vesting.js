@@ -133,7 +133,7 @@ describe("Vesting", function() {
                         true
                     )
                     {
-                        let  monthsVested = Math.floor((days - VESTING_SCHEDULE[i].lock)/30);
+                        let  monthsVested = Math.floor((days - VESTING_SCHEDULE[i].lock)/30)+1;
                         let currentOneMonthVesting = 0;
                         if(monthsVested  > VESTING_SCHEDULE[i].vesting/30){
                             writeString+=`\nVesting Type\t\t: ${VESTING_SCHEDULE[i].name} 🚀 🚀 🚀  TEST COMPLETE`;
