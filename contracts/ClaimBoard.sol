@@ -34,7 +34,7 @@ contract ClaimBoard is Ownable {
     uint256 public constant PRECISION = 1e18;
     uint256 public constant ONE_HUNDRED_PERCENT = PRECISION * 100;
 
-    // Non linear unlocks [vesting type => ][i,j] i% per day for j days
+    // Non linear unlocks (vesting type => [i,j]) i% for j days.
     mapping(uint => uint256[][]) public nonLinearUnlocks;
 
     //tokens already claimed out of allocations.
@@ -105,6 +105,7 @@ contract ClaimBoard is Ownable {
             [uint256(0), 29], //0 till Month 6 
             [uint256(1500), 1] //15% for months 2-7
         ];
+        //Public Round
         nonLinearUnlocks[4] = [
             [uint256(1000), 1], //10% at TGE
             [uint256(0), 29], //1 Month after TGE
@@ -258,9 +259,9 @@ contract ClaimBoard is Ownable {
 
         uint256 diff = block.timestamp-time;
         if(isMonth)
-            return (diff/30 days);
+            return (diff/30 days)+1;
         else
-            return (diff/1 days)+1;
+            return (diff/1 days)+1;  //+1 for first distribution at cliff end 0+1 = 1 month
     }
 
     function isStarted(uint256 startDay) external view returns (bool) {
