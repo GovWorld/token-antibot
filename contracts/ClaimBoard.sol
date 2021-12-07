@@ -25,6 +25,8 @@ struct VestingType {
 }
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "hardhat/console.sol";
+
 contract ClaimBoard is Ownable {
     IERC20 govToken;
     mapping(uint => mapping(address => VestingWallet)) public vestingWallets;
@@ -68,7 +70,7 @@ contract ClaimBoard is Ownable {
             [uint256(0), 29], //0 till Month 8 
             [uint256(1125), 1], //month 2-9 11.25 %
             [uint256(0), 29], //0 till Month 9 
-            [uint256(1125), 1]
+            [uint256(1125), 1] //month 2-9 11.25 %
         ];
         //STRATEGIC ROUND
          nonLinearUnlocks[2] = [
@@ -120,7 +122,7 @@ contract ClaimBoard is Ownable {
             [uint256(1000), 1] //10% for month 5
         ];
         // 0: Angel 7%, 7,000,000 - 21 days cliff, At cliff end 10% for 10 months
-        vestingTypes.push(VestingType(10000000000000000000, 21 days, false,7,0));
+        vestingTypes.push(VestingType(10000000000000000000, 21 days, false,700,0));
 
         // 1: Seed 8.00%, 8,000,000, 14 days cliff, non linear schedule defined above
         vestingTypes.push(VestingType(0, 0 days, true,800,0));
@@ -155,7 +157,7 @@ contract ClaimBoard is Ownable {
 
     // Vested tokens wont be available before the listing time
     function getListingTime() public pure returns (uint256) {
-        return 1638835200;//Tue Dec 07 2021 00:00:00 GMT+0000
+        return 1639094400;//Tue Dec 07 2021 00:00:00 GMT+0000
     }
 
     function mulDiv(
@@ -183,7 +185,7 @@ contract ClaimBoard is Ownable {
             vestingTypes[vestingTypeIndex].totalAllocated += totalAmounts[i];
         }
         require(vestingTypes[vestingTypeIndex].totalAllocated
-                <= (govToken.totalSupply()*vestingTypes[vestingTypeIndex].percent)/100,"Can not allocate more then round limit");
+                <= (govToken.totalSupply()*vestingTypes[vestingTypeIndex].percent)/10000,"Can not allocate more then round limit");
         VestingType memory vestingType = vestingTypes[vestingTypeIndex];
         uint256 addressesLength = addresses.length;
         for (uint256 i = 0; i < addressesLength; i++) {
@@ -323,7 +325,7 @@ contract ClaimBoard is Ownable {
             return 0;
         }
 
-        if (!this.isStarted(vestingWallets[vestingType][sender].cliff)) {
+        if (!this.isStarted(vestingWallets[vestingType][sender].startDay)) {
             return 0;
         }
 
@@ -426,9 +428,8 @@ contract ClaimBoard is Ownable {
             this.canClaim(msg.sender, amount),
             "Unable to transfer, not unlocked yet."
         );
-        govToken.approve(msg.sender,amount);
-        govToken.transfer(msg.sender,amount);
         claimed[msg.sender] = claimed[msg.sender] + amount;
+        govToken.transfer(msg.sender,amount);
         emit Claimed(msg.sender, amount);
     }
 }
