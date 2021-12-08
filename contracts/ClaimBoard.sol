@@ -55,7 +55,7 @@ contract ClaimBoard is Ownable {
         nonLinearUnlocks[1] = [
             [uint256(0), 14], //14 Day cliff
             [uint256(1000), 1], //10% at cliff end 
-            [uint256(0), 45], //0 till Month 2 
+            [uint256(0), 29], //0 till Month 2 
             [uint256(1125), 1], //month 2-9 11.25 %
             [uint256(0), 29], //0 till Month 3 
             [uint256(1125), 1], //month 2-9 11.25 %            
@@ -74,9 +74,9 @@ contract ClaimBoard is Ownable {
         ];
         //STRATEGIC ROUND
          nonLinearUnlocks[2] = [
-            [uint256(0), 7], //14 Day cliff
+            [uint256(0), 7], //7 Day cliff
             [uint256(1000), 1], //10% at cliff end 
-            [uint256(0), 45], //0 till Month 2 
+            [uint256(0), 29], //0 till Month 2 
             [uint256(1500), 1], //month 2-7 15%
             [uint256(0), 29], //0 till Month 3 
             [uint256(1500), 1], //month 2-7 15%
@@ -96,7 +96,7 @@ contract ClaimBoard is Ownable {
             [uint256(500), 1], //5% after cliff
             [uint256(0), 29], //1 Month after cliff end
             [uint256(1500), 1], //15% for months 2-7
-            [uint256(0), 45], //0 till Month 3 
+            [uint256(0), 29], //0 till Month 3 
             [uint256(1500), 1], //15% for months 2-7
             [uint256(0), 29], //0 till Month 4 
             [uint256(1500), 1], //15% for months 2-7
