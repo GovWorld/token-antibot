@@ -94,17 +94,17 @@ contract ClaimBoard is Ownable {
             [uint256(500), 1], //5% at TGE
             [uint256(0), 3], //72h Cliff
             [uint256(500), 1], //5% after cliff
-            [uint256(0), 29], //1 Month after TGE
+            [uint256(0), 29], //1 Month after cliff end
             [uint256(1500), 1], //15% for months 2-7
-            [uint256(0), 45], //0 till Month 2 
-            [uint256(1500), 1], //15% for months 2-7
-            [uint256(0), 29], //0 till Month 3 
+            [uint256(0), 45], //0 till Month 3 
             [uint256(1500), 1], //15% for months 2-7
             [uint256(0), 29], //0 till Month 4 
             [uint256(1500), 1], //15% for months 2-7
             [uint256(0), 29], //0 till Month 5 
             [uint256(1500), 1], //15% for months 2-7
             [uint256(0), 29], //0 till Month 6 
+            [uint256(1500), 1], //15% for months 2-7
+            [uint256(0), 29], //0 till Month 7 
             [uint256(1500), 1] //15% for months 2-7
         ];
         //Public Round
@@ -114,7 +114,7 @@ contract ClaimBoard is Ownable {
             [uint256(2000), 1], //20% for 4 months
             [uint256(0), 29], //2 Month after TGE
             [uint256(2000), 1], //20% for 4 months
-            [uint256(0), 45], //0 till Month 3 
+            [uint256(0), 29], //0 till Month 3 
             [uint256(2000), 1], //20% for 4 months
             [uint256(0), 29], //0 till Month 4 
             [uint256(2000), 1],//20% for 4 months
