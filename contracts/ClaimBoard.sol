@@ -124,13 +124,13 @@ contract ClaimBoard is Ownable {
         // 0: Angel 7%, 7,000,000 - 21 days cliff, At cliff end 10% for 10 months
         vestingTypes.push(VestingType(10000000000000000000, 21 days, false,700,0));
 
-        // 1: Seed 8.00%, 8,000,000, 14 days cliff, non linear schedule defined above
+        // 1: Seed 8.00%, 8,000,000, cliff defined in nonLinearUnlocks, non linear schedule defined above
         vestingTypes.push(VestingType(0, 0 days, true,800,0));
 
-        // 2: Strategic 10%, 10,000,000, 7 Days LOCK, non linear schedule defined above
+        // 2: Strategic 10%, 10,000,000, cliff defined in nonLinearUnlocks, non linear schedule defined above
         vestingTypes.push(VestingType(0, 0 days, true,1000,0));
 
-        // 3: Pivate 10%, 10,000,000, 1 Days LOCK,  non linear schedule defined above
+        // 3: Pivate 10%, 10,000,000,  cliff defined in nonLinearUnlocks,  non linear schedule defined above
         vestingTypes.push(VestingType(0, 0 days, true,1000,0));
 
        // 4: Public 6%, 6,000,000, 10% @ TGE 20 % for 4 months and 10 % month 5
